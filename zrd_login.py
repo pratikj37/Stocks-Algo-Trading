@@ -47,3 +47,28 @@ def get_login(api_key, api_secret):
 kite = get_login(api_key, api_secret)
 
 
+def get_good_values(name):
+
+    zrd_name = 'NSE:' + name
+    data = kite.quote([zrd_name])
+
+    ltp = data[zrd_name]['last_price']
+    openx = data[zrd_name]['ohlc']['open'] 
+    high = data[zrd_name]['ohlc']['high'] 
+    low = data[zrd_name]['ohlc']['low'] 
+    close = data[zrd_name]['ohlc']['close']
+    volume = data[zrd_name]['volume']
+
+    return ltp, openx, high, low, close, volume
+
+
+def get_data(name, segment, delta, interval, continuous, oi):
+
+    token = kite.ltp([segment + name])[segment + name]['instrument_token']
+    to_date = datetime.datetime.now().date()
+    from_date = to_date - datetime.timedelta(days=delta)
+
+    data = kite.historical_data(instrument_token=token, from_date=from_date, to_date=to_date, interval=interval, continuous=False, oi=False)
+    df = pd.DataFrame(data)
+    # df = df.set_index(df['date'])
+    return df
